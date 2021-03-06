@@ -3,15 +3,20 @@ os: linux
 files:
   - source: /
     destination: /home/ubuntu/TweetScraper
+permissions:
+  - object: /home/ubuntu/TweetScraper
+    owner: ubuntu
+    group: ubuntu
+    mode: 777
 hooks:
   BeforeInstall:
     - location: scripts/install_dependencies
       timeout: 300
-      runas: ubuntu
+      runas: root
     - location: scripts/start_server
       timeout: 300
-      runas: ubuntu
+      runas: root
   ApplicationStop:
     - location: scripts/stop_server
       timeout: 300
-      runas: ubuntu
+      runas: root
