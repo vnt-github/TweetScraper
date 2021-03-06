@@ -9,10 +9,11 @@ from scrapy_selenium import SeleniumRequest, SeleniumMiddleware
 
 from TweetScraper.items import Tweet, User
 
+from datetime import date, datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
-
+# https://developer.twitter.com/en/docs/twitter-api/pagination
 class TweetScraper(CrawlSpider):
     name = 'TweetScraper'
     allowed_domains = ['twitter.com']
@@ -45,11 +46,15 @@ class TweetScraper(CrawlSpider):
             f'&pc=1'
             f'&spelling_corrections=1'
             f'&ext=mediaStats%2ChighlightedLabel'
-            f'&count=20'
+            f'&count=10'
             f'&tweet_search_mode=live'
+            f'&max_results=10'
         )
-        self.url = self.url + '&q={query}'
+        until = (datetime.today() - timedelta(30)).strftime('%Y-%m-%d')
+        since = (date.today() - timedelta(31)).strftime('%Y-%m-%d')
+        self.url = self.url + f'&q={query} lang:en until:{until} since:{since}'
         self.query = query
+        print("selfy.query", self.query, "self.url", self.url)
         self.num_search_issued = 0
         # regex for finding next cursor
         self.cursor_re = re.compile('"(scroll:[^"]*)"')
@@ -130,8 +135,8 @@ class TweetScraper(CrawlSpider):
 
         # get next page
         cursor = self.cursor_re.search(response.text).group(1)
-        for r in self.start_query_request(cursor=cursor):
-            yield r
+        # for r in self.start_query_request(cursor=cursor):
+        #     yield r
 
 
     def parse_tweet_item(self, items):
