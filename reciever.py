@@ -4,6 +4,8 @@ import os
 import json
 from os.path import join, dirname
 from dotenv import load_dotenv
+from scrapy.crawler import CrawlerProcess
+from scrapy.utils.project import get_project_settings
 
 # Create .env file path.
 dotenv_path = join(dirname(__file__), '.env')
@@ -18,18 +20,22 @@ def update_cookie(value):
     with open(cookie_path, "w+") as f:
         f.write(value)
 
+def start_scraping(query):
+    process = CrawlerProcess(get_project_settings())
+    process.crawl('TweetScraper', query)
+    process.start()
+
 def handle_message(message):
     try:
         type = message["MessageAttributes"]["Type"]["StringValue"].lower()
         if type == 'cookie':
             update_cookie(message["Body"])
         elif type == 'scrapequery':
-            # TODO:
-            # https://stackoverflow.com/questions/13437402/how-to-run-scrapy-from-within-a-python-script
-            print('call scrapper with time split query')
+            start_scraping(message["Body"])
     except Exception as err:
         print(f"message:  {message} parsing err: {err}")
 
+print('listening for events')
 while(True):
     # Receive message from SQS queue
     response = sqs.receive_message(

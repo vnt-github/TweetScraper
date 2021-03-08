@@ -1,1 +1,4 @@
 #!/bin/bash
+cd /home/ubuntu/TweetScraper
+ll
+python ./reciever.py
