@@ -12,27 +12,28 @@ sqs = boto3.client('sqs')
 queue_url = os.getenv("QUEUE_URL")
 
 # Send message to SQS queue
+# response = sqs.send_message(
+#     QueueUrl=queue_url,
+#     DelaySeconds=10,
+#     MessageAttributes={
+#         'Type': {
+#             'DataType': 'String',
+#             'StringValue': 'ScrapeQuery'
+#         }
+#     },
+#     MessageBody=('covid-19')
+# )
+
 response = sqs.send_message(
     QueueUrl=queue_url,
     DelaySeconds=10,
     MessageAttributes={
-        'Title': {
+        'Type': {
             'DataType': 'String',
-            'StringValue': 'The Whistler'
-        },
-        'Author': {
-            'DataType': 'String',
-            'StringValue': 'John Grisham'
-        },
-        'WeeksOn': {
-            'DataType': 'Number',
-            'StringValue': '6'
+            'StringValue': 'Cookie'
         }
     },
-    MessageBody=(
-        'Information about current NY Times fiction bestseller for '
-        'week of 12/11/2016.'
-    )
+    MessageBody=('1368860798689284100')
 )
 
 print(response['MessageId'])

@@ -1,4 +1,4 @@
-import re, json, logging
+import re, json, logging, os
 from urllib.parse import quote
 
 from scrapy import http
@@ -10,6 +10,15 @@ from scrapy_selenium import SeleniumRequest, SeleniumMiddleware
 from TweetScraper.items import Tweet, User
 
 from datetime import date, datetime, timedelta
+
+from os.path import join, dirname
+from dotenv import load_dotenv
+
+# Create .env file path.
+dotenv_path = join(dirname(__file__), '../../.env')
+# Load file from the path.
+load_dotenv(dotenv_path)
+cookie_path = os.getenv("COOKIE_PATH")
 
 logger = logging.getLogger(__name__)
 
@@ -76,12 +85,19 @@ class TweetScraper(CrawlSpider):
         for r in self.start_query_request():
             yield r
 
+    def load_cookies(self):
+        print(f'loading cookies from {cookie_path}')
+        with open(cookie_path, 'r') as f:
+            value = f.read()
+        return value
 
     def update_cookies(self, response):
         driver = response.meta['driver']
         try:
             self.cookies = driver.get_cookies()
-            self.x_guest_token = driver.get_cookie('gt')['value']
+            # self.x_guest_token = driver.get_cookie('gt')['value']
+
+            self.x_guest_token = self.load_cookies()
             # self.x_csrf_token = driver.get_cookie('ct0')['value']
         except:
             logger.info('cookies are not updated!')
