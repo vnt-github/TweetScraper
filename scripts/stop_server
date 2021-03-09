@@ -1,2 +1,8 @@
-#!/bin/bash
-if pgrep python; then killall python; fi
+receiver_pids=$(ps ax | grep [r]eceiver | awk '{ print $1 }')
+receiver_pids_count=$(echo $receiver_pids | wc -w)
+if [[ $receiver_pids_count -gt 0 ]] ; then
+    echo "killing:" $receiver_pids
+    kill -9 $receiver_pids
+else
+    echo "no processes present:" $receiver_pids_count
+fi
