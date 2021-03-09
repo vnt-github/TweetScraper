@@ -1,2 +1,2 @@
 #!/bin/bash
-killall python
+if pgrep python; then killall python; fi
