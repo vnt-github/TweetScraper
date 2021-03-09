@@ -1,6 +1,7 @@
 #!/bin/bash
 cd /home/ubuntu/TweetScraper
 source ~/.bashrc
+export PATH="/home/ubuntu/miniconda3/condabin:$PATH"
 ls
 conda init
 eval "$(conda shell.bash hook)"
