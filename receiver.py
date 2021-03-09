@@ -5,8 +5,10 @@ import json
 import sys
 from os.path import join, dirname
 from dotenv import load_dotenv
-from scrapy.crawler import CrawlerProcess
+from scrapy.crawler import CrawlerRunner
 from scrapy.utils.project import get_project_settings
+from twisted.internet import reactor
+from multiprocessing import Process, Queue
 
 # Create .env file path.
 dotenv_path = join(dirname(__file__), '.env')
@@ -17,15 +19,31 @@ sqs = boto3.client('sqs')
 query_queue_url = os.getenv("QUERY_QUEUE_URL")
 cookie_queue_url = os.getenv("COOKIE_QUEUE_URL")
 cookie_path = os.getenv("COOKIE_PATH")
+delimiter = os.getenv("DELIMITER")
+runner = CrawlerRunner(get_project_settings())
 
 def update_cookie(value):
     with open(cookie_path, "w+") as f:
         f.write(value)
 
 def start_scraping(query):
-    process = CrawlerProcess(get_project_settings())
-    process.crawl('TweetScraper', query)
-    process.start()
+    def f(q):
+        try:
+            keyword, until_day, since_day = query.split(delimiter)
+            runner = CrawlerRunner(get_project_settings())
+            deferred = runner.crawl('TweetScraper', keyword, until_day, since_day)
+            deferred.addBoth(lambda _: reactor.stop())
+            reactor.run()
+            q.put(None)
+        except Exception as e:
+            q.put(e)
+
+    q = Queue()
+    p = Process(target=f, args=(q,))
+    p.start()
+    result = q.get()
+    p.join()
+    if result is not None: raise result
 
 def delete_message(message, queue):
     receipt_handle = message['ReceiptHandle']

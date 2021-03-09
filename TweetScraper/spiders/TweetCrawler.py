@@ -19,6 +19,7 @@ dotenv_path = join(dirname(__file__), '../../.env')
 # Load file from the path.
 load_dotenv(dotenv_path)
 cookie_path = os.getenv("COOKIE_PATH")
+scraping_limit = os.getenv("SCRAPING_LIMIT")
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ class TweetScraper(CrawlSpider):
     name = 'TweetScraper'
     allowed_domains = ['twitter.com']
 
-    def __init__(self, query=''):
+    def __init__(self, keyword='', until_day=1, since_day=0):
         self.url = (
             f'https://api.twitter.com/2/search/adaptive.json?'
             f'include_profile_interstitial_type=1'
@@ -55,14 +56,14 @@ class TweetScraper(CrawlSpider):
             f'&pc=1'
             f'&spelling_corrections=1'
             f'&ext=mediaStats%2ChighlightedLabel'
-            f'&count=10'
+            f'&count={scraping_limit}'
             f'&tweet_search_mode=live'
-            f'&max_results=10'
+            f'&max_results=100'
         )
-        until = (datetime.today() - timedelta(30)).strftime('%Y-%m-%d')
-        since = (date.today() - timedelta(31)).strftime('%Y-%m-%d')
-        self.url = self.url + f'&q={query} lang:en until:{until} since:{since}'
-        self.query = query
+        until = (datetime.today() - timedelta(int(until_day))).strftime('%Y-%m-%d')
+        since = (date.today() - timedelta(int(since_day))).strftime('%Y-%m-%d')
+        self.url = self.url + f'&q={keyword} lang:en until:{until} since:{since}'
+        self.query = keyword
         print("selfy.query", self.query, "self.url", self.url)
         self.num_search_issued = 0
         # regex for finding next cursor
