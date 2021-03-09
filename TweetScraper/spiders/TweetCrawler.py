@@ -60,9 +60,9 @@ class TweetScraper(CrawlSpider):
             f'&tweet_search_mode=live'
             f'&max_results=100'
         )
-        until = (datetime.today() - timedelta(int(until_day))).strftime('%Y-%m-%d')
-        since = (date.today() - timedelta(int(since_day))).strftime('%Y-%m-%d')
-        self.url = self.url + f'&q={keyword} lang:en until:{until} since:{since}'
+        self.until = (datetime.today() - timedelta(int(until_day))).strftime('%Y-%m-%d')
+        self.since = (date.today() - timedelta(int(since_day))).strftime('%Y-%m-%d')
+        self.url = self.url + f'&q={keyword} lang:en until:{self.until} since:{self.since}'
         self.query = keyword
         print("selfy.query", self.query, "self.url", self.url)
         self.num_search_issued = 0
