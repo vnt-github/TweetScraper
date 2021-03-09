@@ -8,8 +8,10 @@ LOG_LEVEL = 'INFO'
 SPIDER_MODULES = ['TweetScraper.spiders']
 NEWSPIDER_MODULE = 'TweetScraper.spiders'
 ITEM_PIPELINES = {
-    'TweetScraper.pipelines.SaveToFilePipeline':100,
+    # 'TweetScraper.pipelines.SaveToFilePipeline':100,
+    's3pipeline.S3Pipeline': 100,
 }
+S3PIPELINE_URL = 's3://sentiment-data/input/{query}_{since}_{until}_{chunk:07d}.jl'
 
 # settings for where to save data on disk
 SAVE_TWEET_PATH = './Data/tweet/'
