@@ -7,5 +7,7 @@ conda init
 eval "$(conda shell.bash hook)"
 conda activate tweetscraper
 which python
-nohup python -u ./reciever.py > output.log 2>error.logs &
+nohup python -u ./receiver.py scraping > scraping.out 2>scraping.err &
+nohup python -u ./receiver.py cookies > cookies.out 2>cookies.err &
+
 echo "started listening events"

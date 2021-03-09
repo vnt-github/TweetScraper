@@ -1,1 +1,2 @@
 #!/bin/bash
+kill -9 `ps ax | grep  "[r]eceiver" | awk '{ print $1 }'`

@@ -9,12 +9,12 @@ dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 # Create SQS client
 sqs = boto3.client('sqs')
-queue_url = os.getenv("QUEUE_URL")
+query_queue_url = os.getenv("QUERY_query_queue_url")
+cookie_queue_url = os.getenv("COOKIE_QUEUE_URL")
 
 # Send message to SQS queue
 # response = sqs.send_message(
-#     QueueUrl=queue_url,
-#     DelaySeconds=10,
+#     QueueUrl=query_queue_url,
 #     MessageAttributes={
 #         'Type': {
 #             'DataType': 'String',
@@ -25,15 +25,14 @@ queue_url = os.getenv("QUEUE_URL")
 # )
 
 response = sqs.send_message(
-    QueueUrl=queue_url,
-    DelaySeconds=10,
+    QueueUrl=cookie_queue_url,
     MessageAttributes={
         'Type': {
             'DataType': 'String',
             'StringValue': 'Cookie'
         }
     },
-    MessageBody=('1368860798689284100')
+    MessageBody=('1369106427134930944')
 )
 
 print(response['MessageId'])
